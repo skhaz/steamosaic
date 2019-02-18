@@ -82,7 +82,7 @@ def pubsub(event, context):
 
   try:
     steam_id = str(get_steam_id(document_id))
-    maximum = 500
+    maximum = 1000
     games = [n for n in get_games(steam_id) if n['img_logo_url']][:maximum]
     build_url = lambda entry: MEDIA_URL.format(
       entry['appid'], entry['img_logo_url'])
