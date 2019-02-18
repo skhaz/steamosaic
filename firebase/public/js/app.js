@@ -17,7 +17,7 @@ render = () => {
 }
 
 renderInput = (element) => {
-    const html = `
+  const html = `
     <form class="outer" action="#" onsubmit="onSubmit(event); return false;" >
       <p>enter your steam profile</p>
       <input id="input" type="text" placeholder="https://steamcommunity.com/id/skhaz or skhaz"></input>
