@@ -1,0 +1,7 @@
+requests==2.21.0
+numpy==1.16.1
+pillow==5.4.1
+requests==2.21.0
+joblib==0.13.2
+google-cloud-storage==1.14.0
+firebase-admin==2.15.1
