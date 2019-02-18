@@ -2,7 +2,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
     match /{assets=**} {
       allow read, create;
-      allow update: if request.resource.data.url == resource.data.url
+      allow update: if request.resource.data.url == resource.data.url;
     }
   }
 }
