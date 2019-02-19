@@ -3,7 +3,7 @@ onSubmit = (event) => {
   const input = document.getElementById('input');
   var el = document.createElement('a');
   el.href = input.value;
-  const value = el.pathname.replace(/\/$/, '').split('/').slice(-1).pop().trim();
+  const value = el.pathname.replace(/\/$/, '').split('/').slice(-1).pop().trim().toLowerCase();
 
   if (value) {
     window.location.hash = value;
