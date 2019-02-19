@@ -52,7 +52,7 @@ renderMosaic = (uid, element) => {
         html = `
           <center>
             <h2>${error}</h2>
-            <a href="/">f</a>
+            <a href="/">go back</a>
           </center>`;  
       }
 
