@@ -35,8 +35,6 @@ bucket = storage_client.get_bucket(os.environ['BUCKET'])
 
 
 def get_steam_id(user):
-  logging.info(f'fetching steam_id of the user {user}')
-  uid = urlparse(user).path.strip('/').rsplit('/', 1)[-1]
   if not uid:
     return
   try:
@@ -79,6 +77,8 @@ def pubsub(event, context):
     base64.b64decode(event['data']).decode('utf-8'))
   document_id = message['document_id']
   reference = db.collection('assets').document(document_id)
+
+  logging.info(f'fetching steam_id of the user {document_id}')
 
   try:
     steam_id = str(get_steam_id(document_id))
