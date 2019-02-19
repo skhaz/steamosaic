@@ -4,12 +4,6 @@ body {
   font-family: 'Open Sans', sans-serif;
 }
 
-.outer {
-  margin: 0 auto;
-  max-width: 600px;
-  padding: 80px 20px;   
-}
-
 #input {
   appearance: none;
   font-size: 16px;
@@ -25,7 +19,21 @@ body {
   box-sizing: border-box; 
 }
 
+.outer {
+  margin: 0 auto;
+  max-width: 600px;
+  padding: 80px 20px;
+}
+
 .display {
   width: 100%;
   overflow: hidden;
+}
+
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
 }
