@@ -51,7 +51,8 @@ renderMosaic = (uid, element) => {
       } else if (error) {
         html = `
           <center>
-            <h2>profile not found or private.</h2>
+            <h2>${error}</h2>
+            <a href="/">f</a>
           </center>`;  
       }
 

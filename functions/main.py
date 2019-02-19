@@ -34,9 +34,8 @@ storage_client = storage.Client()
 bucket = storage_client.get_bucket(os.environ['BUCKET'])
 
 
-def get_steam_id(user):
-  if not uid:
-    return
+def get_steam_id(uid):
+  logging.info(f'fetching steam_id of the user {uid}')
   try:
     return int(uid)
   except ValueError:
@@ -78,8 +77,6 @@ def pubsub(event, context):
   document_id = message['document_id']
   reference = db.collection('assets').document(document_id)
 
-  logging.info(f'fetching steam_id of the user {document_id}')
-
   try:
     steam_id = str(get_steam_id(document_id))
     maximum = 1000
@@ -89,8 +86,7 @@ def pubsub(event, context):
     fetch = lambda game: functools.reduce(lambda g, f: f(g), [build_url, download], game)
     arr = np.array([g for g in map(fetch, games) if g is not None])
   except (KeyError, requests.exceptions.HTTPError):
-    logging.info(f'private profile or not found {document_id}')
-    reference.set({'error': True})
+    reference.set({'error': 'private profile or not found.'})
     return
 
   buffer = io.BytesIO()
