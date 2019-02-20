@@ -8,10 +8,10 @@ const pubsub = new PubSub();
 
 
 exports.notify = functions.firestore
-  .document('assets/{uid}')
-  .onCreate(async (snapshot, context) => {
-    const dataBuffer = Buffer.from(
-      JSON.stringify({ document_id: context.params.uid }));
+  .document('users/{uid}')
+  .onCreate((snapshot, context) => {
+    const { uid } = context.params;
+    const dataBuffer = Buffer.from(JSON.stringify({ uid }));
     const topic = pubsub.topic(functions.config().pubsub.topic);
 
     return topic.publish(dataBuffer);

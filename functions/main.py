@@ -49,7 +49,7 @@ def get_games(steam_id):
   response = session.get(GAMES_URL.format(steam_id))
   response.raise_for_status()
   result = response.json()['response']['games']
-  return sorted(result, key=lambda r: r['playtime_forever'], reverse=True)
+  return sorted(result, key=lambda g: g['playtime_forever'], reverse=True)
 
 
 @memory.cache
@@ -74,11 +74,11 @@ def generate(array, columns=10):
 def pubsub(event, context):
   message = json.loads(
     base64.b64decode(event['data']).decode('utf-8'))
-  document_id = message['document_id']
-  reference = db.collection('assets').document(document_id)
+  uid = message['uid']
+  ref = db.collection('users').document(uid)
 
   try:
-    steam_id = str(get_steam_id(document_id))
+    steam_id = str(get_steam_id(uid))
     maximum = 1000
     games = [n for n in get_games(steam_id) if n['img_logo_url']][:maximum]
     build_url = lambda entry: MEDIA_URL.format(
@@ -86,7 +86,7 @@ def pubsub(event, context):
     fetch = lambda game: functools.reduce(lambda g, f: f(g), [build_url, download], game)
     arr = np.array([g for g in map(fetch, games) if g is not None])
   except (KeyError, requests.exceptions.HTTPError):
-    reference.set({'error': 'private profile or not found.'})
+    ref.set({'error': 'private profile or not found.'})
     return
 
   buffer = io.BytesIO()
@@ -99,4 +99,4 @@ def pubsub(event, context):
   blob = bucket.blob(os.path.join(steam_id[-1:], filename))
   blob.upload_from_string(buffer.getvalue(), content_type='image/jpeg')
   blob.make_public()
-  reference.update({'url': blob.public_url})
+  ref.update({'url': blob.public_url})
