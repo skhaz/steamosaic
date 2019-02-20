@@ -99,4 +99,4 @@ def pubsub(event, context):
   blob = bucket.blob(os.path.join(steam_id[-1:], filename))
   blob.upload_from_string(buffer.getvalue(), content_type='image/jpeg')
   blob.make_public()
-  ref.update({'url': blob.public_url})
+  ref.set({'url': blob.public_url})
