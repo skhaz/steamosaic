@@ -2,7 +2,7 @@
 
 ![](firebase/public/images/mosaic.jpg)
 
-## Why firebase?
+## Why firestore?
 
 The very first version was using a Google Cloud Function that takes a user as input and generates the mosaic, then returns the image. On the frontend side, I used `XMLHttpRequest` to request the mosaic and that's it.
 
