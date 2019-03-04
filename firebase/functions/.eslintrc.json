@@ -9,6 +9,8 @@
   "rules": {
     "no-console": "off",
 
+    "no-useless-escape": "off",
+
     "no-regex-spaces": "off",
 
     "no-debugger": "off",
