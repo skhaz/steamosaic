@@ -32,7 +32,7 @@ renderInput = (element) => {
     </a>
     <form class="outer" action="#" onsubmit="onSubmit(event); return false;" >
       <p>enter your <b>steam</b> profile</p>
-      <input id="input" type="text" placeholder="https://steamcommunity.com/id/skhaz or skhaz"></input>
+      <input id="input" type="text" placeholder="skhaz or https://steamcommunity.com/id/skhaz"></input>
       <p style="text-align: right;"><i><span id="counter">?</span> mosaics generated so far</i></p>
     </form>
     `;
