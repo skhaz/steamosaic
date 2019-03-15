@@ -22,20 +22,6 @@ exports.notify = functions.firestore
 exports.ticker = functions.pubsub
   .topic('ticker')
   .onPublish(async (_) => {
-    const query = `SELECT COUNT(*) FROM (
-      SELECT
-        REGEXP_EXTRACT(textPayload, r'user (\\w+)') AS steam_id
-      FROM
-        \`steamosaic.steam_ids.cloudfunctions_googleapis_com_cloud_functions_*\`
-      WHERE
-        textPayload LIKE '%fetching steam_id%'
-      GROUP BY
-        steam_id)`
-
-    const response = await bigquery.query(query);
-    const counter = response[0][0].f0_;
-    await firestore.doc('stats/users').set({ counter });
-
     const result = await firestore
       .collection('users')
       .where('error', '>', '')
@@ -48,5 +34,23 @@ exports.ticker = functions.pubsub
       batch.delete(doc.ref);
     });
 
-    await batch.commit();
+    return batch.commit();
+  });
+
+exports.analytics = functions.pubsub
+  .topic('analytics')
+  .onPublish(async (_) => {
+    const query = `SELECT COUNT(*) FROM (
+      SELECT
+        REGEXP_EXTRACT(textPayload, r'user (\\w+)') AS steam_id
+      FROM
+        \`steamosaic.steam_ids.cloudfunctions_googleapis_com_cloud_functions_*\`
+      WHERE
+        textPayload LIKE '%fetching steam_id%'
+      GROUP BY
+        steam_id)`
+
+    const response = await bigquery.query(query);
+    const counter = response[0][0].f0_;
+    return firestore.doc('stats/users').set({ counter });
   });
