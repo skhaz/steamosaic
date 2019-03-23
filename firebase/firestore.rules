@@ -1,9 +1,12 @@
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{assets=**} {
+    match /{users=**} {
       allow read, create;
       allow update: if request.resource.data.url == resource.data.url &&
         request.resource.data.error == resource.data.error;
+    }
+    match /{stats=**} {
+      allow write: if false;
     }
   }
 }
