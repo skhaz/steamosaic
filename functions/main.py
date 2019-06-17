@@ -75,7 +75,7 @@ def pubsub(event, context):
   message = json.loads(
     base64.b64decode(event['data']).decode('utf-8'))
   uid = message['uid']
-  docRef = db.collection('users').document(uid)
+  dref = db.collection('users').document(uid)
 
   try:
     steam_id = str(get_steam_id(uid))
@@ -86,7 +86,7 @@ def pubsub(event, context):
     fetch = lambda game: functools.reduce(lambda g, f: f(g), [build_url, download], game)
     arr = np.array([g for g in map(fetch, games) if g is not None])
   except (KeyError, requests.exceptions.HTTPError):
-    docRef.set({'error': "private profile or not found."})
+    dref.set({'error': "private profile or not found."})
     return
 
   buffer = io.BytesIO()
@@ -96,7 +96,7 @@ def pubsub(event, context):
   try:
     generate(arr[:limit], columns).save(buffer, 'JPEG', quality=90)
   except ValueError:
-    docRef.set({'error': "internal error or insufficient amount of games to generate the image."})
+    dref.set({'error': "internal error or insufficient amount of games to generate the image."})
     return
 
   filename = os.path.join(steam_id[-1:], ''.join([steam_id, '.jpg']))
@@ -104,4 +104,4 @@ def pubsub(event, context):
   blob.upload_from_string(buffer.getvalue(), content_type='image/jpeg')
   blob.make_public()
   url = 'https://%s/%s' % (os.environ['BUCKET'], filename)
-  docRef.set({'url': url})
+  dref.set({'url': url})
