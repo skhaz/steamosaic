@@ -1,8 +1,3 @@
-window.dataLayer = window.dataLayer || [];
-function gtag() { dataLayer.push(arguments); }
-gtag('js', new Date());
-gtag('config', 'UA-134529977-1');
-
 onSubmit = (event) => {
   event.preventDefault();
   const input = document.getElementById('input');
