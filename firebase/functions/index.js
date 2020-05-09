@@ -36,21 +36,3 @@ exports.ticker = functions.pubsub
 
     return batch.commit();
   });
-
-exports.ticker = functions.pubsub
-  .schedule('every 12 hour')
-  .onRun(async (context) => {
-    const query = `SELECT COUNT(*) FROM (
-      SELECT
-        REGEXP_EXTRACT(textPayload, r'user (\\w+)') AS steam_id
-      FROM
-        \`steamosaic.steam_ids.cloudfunctions_googleapis_com_cloud_functions_*\`
-      WHERE
-        textPayload LIKE '%fetching steam_id%'
-      GROUP BY
-        steam_id)`
-
-    const response = await bigquery.query(query);
-    const counter = response[0][0].f0_;
-    return firestore.doc('stats/users').set({ counter });
-  });
