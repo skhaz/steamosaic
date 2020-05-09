@@ -75,7 +75,7 @@ def pubsub(event, context):
   message = json.loads(
     base64.b64decode(event['data']).decode('utf-8'))
   uid = message['uid']
-  ref = db.collection('users').document(uid)
+  reference = db.collection('users').document(uid)
 
   try:
     sid = str(get_steam_id(uid))
@@ -86,7 +86,7 @@ def pubsub(event, context):
     fetch = lambda game: functools.reduce(lambda g, f: f(g), [build_url, download], game)
     arr = np.array([g for g in map(fetch, games) if g is not None])
   except (KeyError, requests.exceptions.HTTPError):
-    ref.set({'error': 'private profile or not found.'})
+    reference.set({'error': 'private profile or not found.'})
     return
 
   try:
@@ -96,11 +96,11 @@ def pubsub(event, context):
     limit = nearest(len(arr), columns)
     generate(arr[:limit], columns).save(buffer, 'JPEG', quality=90)
   except ValueError:
-    ref.set({'error': 'internal error or insufficient amount of games to generate the image.'})
+    reference.set({'error': 'internal error or insufficient amount of games to generate the image.'})
     return
 
   filepath = f'{sid[-1:]}/{sid}.jpg'
   blob = bucket.blob(filepath)
   blob.upload_from_string(buffer.getvalue(), content_type='image/jpeg')
   blob.make_public()
-  ref.set({'url': 'https://gcs.steamosaic.com/%s' % (filepath)})
+  reference.set({'url': 'https://gcs.steamosaic.com/%s' % (filepath)})
