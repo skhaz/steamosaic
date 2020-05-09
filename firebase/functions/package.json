@@ -1,17 +1,4 @@
 {
-  "name": "functions",
-  "description": "Cloud Functions for Firebase",
-  "scripts": {
-    "lint": "eslint .",
-    "serve": "firebase serve --only functions",
-    "shell": "firebase functions:shell",
-    "start": "npm run shell",
-    "deploy": "firebase deploy --only functions",
-    "logs": "firebase functions:log"
-  },
-  "engines": {
-    "node": "8"
-  },
   "dependencies": {
     "@google-cloud/bigquery": "^4.7.0",
     "@google-cloud/pubsub": "^1.7.3",
@@ -22,5 +9,14 @@
     "eslint": "^6.8.0",
     "eslint-plugin-promise": "^4.2.1"
   },
-  "private": true
+  "engines": {
+    "node": "10"
+  },
+  "scripts": {
+    "serve": "firebase serve --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  }
 }
