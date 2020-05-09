@@ -1,12 +1,10 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const { PubSub } = require('@google-cloud/pubsub');
-const { BigQuery } = require('@google-cloud/bigquery');
 
 admin.initializeApp();
 const firestore = admin.firestore();
 const pubsub = new PubSub();
-const bigquery = new BigQuery();
 
 
 exports.notify = functions.firestore
