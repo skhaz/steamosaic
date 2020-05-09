@@ -32,11 +32,6 @@ renderInput = (element) => {
       <input id="input" type="text" placeholder="skhaz or https://steamcommunity.com/id/skhaz"></input>
     </form>
     `;
-
-  const el = document.getElementById('counter');
-  const firestore = firebase.app().firestore();
-  firestore.collection('stats').doc('users')
-    .onSnapshot((snapshot) => { if (el) { el.innerHTML = snapshot.data().counter; }});
 }
 
 renderMosaic = (uid, element) => {
