@@ -85,13 +85,12 @@ def index():
     sid = str(get_steam_id(uid))
     maximum = 8192
     games = [n for n in get_games(sid) if n['img_logo_url']][:maximum]
-    build_url = lambda entry: MEDIA_URL.format(
-      entry['appid'], entry['img_logo_url'])
+    build_url = lambda entry: MEDIA_URL.format(entry['appid'], entry['img_logo_url'])
     fetch = lambda game: functools.reduce(lambda g, f: f(g), [build_url, download], game)
     arr = np.array([g for g in map(fetch, games) if g is not None])
   except (KeyError, requests.exceptions.HTTPError):
     reference.set({'error': 'private profile or not found.'})
-    return
+    return ('', 204)
 
   try:
     buffer = io.BytesIO()
@@ -101,7 +100,7 @@ def index():
     generate(arr[:limit], columns).save(buffer, 'JPEG', quality=90)
   except ValueError:
     reference.set({'error': 'internal error or insufficient amount of games to generate the image.'})
-    return
+    return ('', 204)
 
   filepath = f'{sid[-1:]}/{sid}.jpg'
   blob = bucket.blob(filepath)
