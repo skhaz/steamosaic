@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "source": ".",
+    "ignore": [
+      "**/.git/**",
+      "**/.*",
+      "**/node_modules/**",
+      "**/src/**",
+      "**/*.lock",
+      "**/firebase.json"
+    ]
+  }
+  }
