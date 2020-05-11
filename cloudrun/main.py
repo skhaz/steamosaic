@@ -12,6 +12,7 @@ import requests
 
 from PIL import Image
 from joblib import Memory
+from flask import Flask, request
 
 import firebase_admin
 from firebase_admin import credentials
@@ -22,10 +23,10 @@ PROFILE_URL = os.environ['PROFILE_URL']
 GAMES_URL = os.environ['GAMES_URL']
 MEDIA_URL = os.environ['MEDIA_URL']
 
-firebase_admin.initialize_app(
-  credentials.ApplicationDefault(), {
-    'projectId': os.environ['GCP_PROJECT'],
-  })
+# credentials.ApplicationDefault(), {'projectId': os.environ['GCP_PROJECT'],}
+firebase_admin.initialize_app()
+
+app = Flask(__name__)
 
 db = firebase_admin.firestore.client()
 memory = Memory(tempfile.gettempdir(), verbose=0)
@@ -71,10 +72,13 @@ def generate(array, columns=10):
       .reshape(height * rows, width * columns, intensity))
 
 
-def pubsub(event, context):
-  message = json.loads(
-    base64.b64decode(event['data']).decode('utf-8'))
-  uid = message['uid']
+@app.route('/', methods=['POST'])
+def index():
+  message = request.get_json()['message']
+
+  data = json.loads(
+    base64.b64decode(message['data']).decode('utf-8'))
+  uid = data['uid']
   reference = db.collection('users').document(uid)
 
   try:
@@ -104,3 +108,5 @@ def pubsub(event, context):
   blob.upload_from_string(buffer.getvalue(), content_type='image/jpeg')
   blob.make_public()
   reference.set({'url': 'https://gcs.steamosaic.com/%s' % (filepath)})
+
+  return ('', 204)
