@@ -23,3 +23,11 @@ If you want to take a look more deeply, these are the main files [main.py], [ind
 [main.py]: https://github.com/skhaz/steamosaic/blob/master/functions/main.py
 [index.js]: https://github.com/skhaz/steamosaic/blob/master/firebase/functions/index.js
 [app.js]: https://github.com/skhaz/steamosaic/blob/master/firebase/public/js/app.js
+
+### Deploy
+
+Cloud run
+
+``` bash
+cd cloudrun && gcloud alpha run deploy pubsub --source . --project steamosaic
+```

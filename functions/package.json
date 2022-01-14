@@ -1,8 +1,8 @@
 {
   "dependencies": {
-    "@google-cloud/pubsub": "^2.5.0",
-    "firebase-admin": "^9.2.0",
-    "firebase-functions": "^3.11.0"
+    "@google-cloud/pubsub": "^2.18.4",
+    "firebase-admin": "^10.0.1",
+    "firebase-functions": "^3.16.0"
   },
   "engines": {
     "node": "10"
@@ -11,6 +11,6 @@
     "deploy": "firebase deploy --only functions"
   },
   "devDependencies": {
-    "firebase-tools": "^8.10.0"
+    "firebase-tools": "^10.1.0"
   }
 }

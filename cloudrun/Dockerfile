@@ -1,4 +1,4 @@
-FROM python:3.8-slim AS base
+FROM python:3.9-slim AS base
 
 ENV PATH "/opt/venv/bin:$PATH"
 ENV PIP_DISABLE_PIP_VERSION_CHECK 1
