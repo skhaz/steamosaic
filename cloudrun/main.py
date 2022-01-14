@@ -86,7 +86,7 @@ def index():
 
     try:
         sid = str(get_steam_id(uid))
-        maximum = 9216
+        maximum = 10240
         games = [n for n in get_games(sid) if n["img_logo_url"]][:maximum]
         build_url = lambda e: MEDIA_URL.format(e["appid"], e["img_logo_url"])
         funcs = [build_url, download]
