@@ -14,6 +14,7 @@ from google.cloud.storage import Client as StorageClient
 from joblib import Memory
 from PIL import Image
 from requests import Session
+from requests.exceptions import HTTPError
 
 app = Flask(__name__)
 
@@ -92,7 +93,7 @@ def index():
         fetch = lambda game: functools.reduce(lambda g, f: f(g), funcs, game)
 
         array = np.array([g for g in map(fetch, games) if g is not None])
-    except (KeyError, requests.exceptions.HTTPError):
+    except (KeyError, HTTPError):
         reference.set({"error": "private profile or not found."})
         return NO_CONTENT
 

@@ -26,8 +26,20 @@ If you want to take a look more deeply, these are the main files [main.py], [ind
 
 ### Deploy
 
-Cloud run
+Cloud Run
 
 ``` bash
 cd cloudrun && gcloud alpha run deploy pubsub --source . --project steamosaic
+```
+
+Firebase Functions
+
+``` bash
+cd functions && npm run deploy
+```
+
+Firebase Hosting
+
+```
+cd firebase && npx firebase-tools deploy --only hosting
 ```
