@@ -41,5 +41,5 @@ cd functions && npm run deploy
 Firebase Hosting
 
 ``` bash
-cd firebase && npx firebase-tools deploy --only hosting
+cd website && npx firebase-tools deploy --only hosting
 ```
