@@ -1,19 +1,19 @@
 import base64
 import functools
+import http
 import io
 import json
 import logging
 import os
 import tempfile
-import http
 
 import numpy as np
-from requests import Session
 from flask import Flask, request
 from google.cloud.firestore import Client as FirestoreClient
 from google.cloud.storage import Client as StorageClient
 from joblib import Memory
 from PIL import Image
+from requests import Session
 
 app = Flask(__name__)
 
