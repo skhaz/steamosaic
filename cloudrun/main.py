@@ -63,7 +63,9 @@ def download(url):
 
 def generate(array, columns=10):
     length, height, width, intensity = array.shape
+
     rows = length // columns
+
     return Image.fromarray(
         array.reshape(rows, columns, height, width, intensity)
         .swapaxes(1, 2)
@@ -76,7 +78,9 @@ def index():
     message = request.get_json()["message"]
 
     data = json.loads(base64.b64decode(message["data"]).decode("utf-8"))
+
     uid = data["uid"]
+
     reference = firestore.collection("users").document(uid)
 
     try:
@@ -109,9 +113,11 @@ def index():
         return NO_CONTENT
 
     filepath = f"{sid[-1:]}/{sid}.jpg"
+
     blob = bucket.blob(filepath)
     blob.upload_from_string(buffer.getvalue(), content_type="image/jpeg")
     blob.make_public()
+
     reference.set({"url": "https://gcs.steamosaic.com/%s" % (filepath)})
 
     return NO_CONTENT
