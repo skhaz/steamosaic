@@ -33,6 +33,8 @@ GAMES_URL = os.environ["GAMES_URL"]
 MEDIA_URL = os.environ["MEDIA_URL"]
 
 NO_CONTENT = "", http.HTTPStatus.NO_CONTENT
+CAPSULE_WIDTH = 184
+CAPSULE_HEIGHT = 69
 
 
 def get_steam_id(uid):
@@ -58,8 +60,9 @@ def download(url):
     try:
         image = Image.open(io.BytesIO(requests.get(url).content))
 
-        # Unfortunately, the images do not always have the same size
-        if image.width != 184 or image.height != 69:
+        # unfortunately, the images do not always have the same size, and
+        # np.array requires the same size
+        if image.width != CAPSULE_WIDTH or image.height != CAPSULE_HEIGHT:
             return
 
         return np.asarray(image.convert("RGB"))
