@@ -67,7 +67,7 @@ def download(url):
         logging.warning(f"failed to download or invalid image at {url}")
 
 
-def generate(array, columns=10):
+def generate(array, columns):
     length, height, width, intensity = array.shape
 
     rows = length // columns
