@@ -1,0 +1,13 @@
+version: "3"
+services:
+  app:
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS
+      - BUCKET
+      - PROFILE_URL
+      - GAMES_URL
+      - MEDIA_URL

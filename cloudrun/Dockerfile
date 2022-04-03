@@ -12,12 +12,11 @@ COPY requirements.txt .
 RUN pip install --requirement requirements.txt
 
 FROM base
-RUN apt-get update
-RUN apt-get install --yes --no-install-recommends libjemalloc2
+RUN apt-get update && apt-get install --yes --no-install-recommends libjemalloc2
 
 WORKDIR /app
 COPY --from=builder /opt/venv /opt/venv
-COPY *.py .
+COPY . .
 ENV LD_PRELOAD /usr/lib/x86_64-linux-gnu/libjemalloc.so.2
 
 ARG PORT=8000

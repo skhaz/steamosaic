@@ -57,6 +57,11 @@ def get_games(sid):
 def download(url):
     try:
         image = Image.open(io.BytesIO(requests.get(url).content))
+
+        # Unfortunately, the images do not always have the same size
+        if image.width != 184 or image.height != 69:
+            return
+
         return np.asarray(image.convert("RGB"))
     except (OSError, IOError):
         logging.warning(f"failed to download or invalid image at {url}")
@@ -86,14 +91,14 @@ def index():
 
     try:
         sid = str(get_steam_id(uid))
-        maximum = 10240
-        games = [n for n in get_games(sid) if n["img_logo_url"]][:maximum]
-        build_url = lambda e: MEDIA_URL.format(e["appid"], e["img_logo_url"])
+        games = get_games(sid)
+        build_url = lambda e: MEDIA_URL.format(e["appid"])
         funcs = [build_url, download]
         fetch = lambda game: functools.reduce(lambda g, f: f(g), funcs, game)
 
         array = np.array([g for g in map(fetch, games) if g is not None])
-    except (KeyError, HTTPError):
+    except (KeyError, HTTPError) as exc:
+        logging.error(exc, exc_info=True)
         reference.set({"error": "private profile or not found."})
         return NO_CONTENT
 
@@ -104,7 +109,8 @@ def index():
         limit = nearest(len(array), columns)
 
         generate(array[:limit], columns).save(buffer, "JPEG", quality=90)
-    except ValueError:
+    except ValueError as exc:
+        logging.error(exc, exc_info=True)
         reference.set(
             {
                 "error": "internal error or insufficient amount of games to generate the image."
