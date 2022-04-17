@@ -112,7 +112,7 @@ def index():
         limit = nearest(len(array), columns)
 
         generate(array[:limit], columns).save(buffer, "JPEG", quality=90)
-    except ValueError as exc:
+    except (ValueError, OSError) as exc:
         logging.error(exc, exc_info=True)
         reference.set(
             {
