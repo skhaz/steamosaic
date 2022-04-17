@@ -7,7 +7,6 @@ ENV PYTHONDONTWRITEBYTECODE 1
 
 FROM base AS builder
 RUN python -m venv /opt/venv
-RUN pip install --upgrade pip
 COPY requirements.txt .
 RUN pip install --requirement requirements.txt
 
