@@ -112,8 +112,9 @@ def index():
         limit = nearest(len(array), columns)
 
         generate(array[:limit], columns).save(buffer, "JPEG", quality=90)
-    except (OSError, ValueError, io.UnsupportedOperation) as exc:
+    except Exception as exc:  # noqa
         logging.error(exc, exc_info=True)
+
         reference.set(
             {
                 "error": "internal error or insufficient amount of games to generate the image."
