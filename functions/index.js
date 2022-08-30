@@ -13,7 +13,13 @@ exports.notify = functions.firestore
     const dataBuffer = Buffer.from(JSON.stringify({ uid }));
     const topic = pubsub.topic(functions.config().pubsub.topic);
 
-    return topic.publish(dataBuffer);
+    return Promise.all([
+      topic.publish(dataBuffer),
+      firestore
+        .collection("counters")
+        .doc("summary")
+        .update({ total: admin.firestore.FieldValue.increment(1) }),
+    ]);
   });
 
 exports.ticker = functions.pubsub

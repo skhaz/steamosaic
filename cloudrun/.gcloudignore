@@ -4,5 +4,4 @@
 .gitignore
 
 docker-compose.yaml
-node_modules
 #!include:.gitignore
