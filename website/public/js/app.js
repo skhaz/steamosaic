@@ -39,7 +39,7 @@ renderMosaic = (uid, element) => {
   const ref = firestore.collection('users').doc(uid);
   const unsubscribe = ref.onSnapshot((snapshot) => {
     if (!snapshot.exists) {
-      ref.set({ _: true });
+      ref.set({ timestamp: new Date() });
     }
 
     const doc = snapshot.data();

@@ -129,6 +129,6 @@ def index():
     blob.upload_from_string(buffer.getvalue(), content_type="image/jpeg")
     blob.make_public()
 
-    reference.set({"url": "https://gcs.steamosaic.com/%s" % (filepath)})
+    reference.update({"url": "https://gcs.steamosaic.com/%s" % (filepath)})
 
     return NO_CONTENT
