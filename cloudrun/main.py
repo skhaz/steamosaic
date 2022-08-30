@@ -102,7 +102,7 @@ def index():
         array = np.array([g for g in map(fetch, games) if g is not None])
     except (KeyError, HTTPError) as exc:
         logging.error(exc, exc_info=True)
-        reference.set({"error": "private profile or not found."})
+        reference.update({"error": "private profile or not found."})
         return NO_CONTENT
 
     try:
@@ -115,7 +115,7 @@ def index():
     except Exception as exc:  # noqa
         logging.error(exc, exc_info=True)
 
-        reference.set(
+        reference.update(
             {
                 "error": "internal error or insufficient amount of games to generate the image."
             }
