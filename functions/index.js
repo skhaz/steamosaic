@@ -25,15 +25,23 @@ exports.notify = functions.firestore
 exports.ticker = functions.pubsub
   .schedule("every 5 minutes")
   .onRun(async (context) => {
-    const result = await firestore
-      .collection("users")
-      .where("error", ">", "")
-      .limit(500)
-      .get();
-
     const batch = firestore.batch();
 
-    result.forEach((document) => {
+    const q1 = await firestore
+      .collection("users")
+      .where("error", ">", "")
+      .get();
+
+    q1.forEach((document) => {
+      batch.delete(document.ref);
+    });
+
+    const q2 = await firestore
+      .collection("users")
+      .where("timestamp", ">", new Date(Date.parse(new Date()) + 86400 * 1000))
+      .get();
+
+    q2.forEach((document) => {
       batch.delete(document.ref);
     });
 
