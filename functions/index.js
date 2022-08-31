@@ -38,7 +38,7 @@ exports.ticker = functions.pubsub
 
     const q2 = await firestore
       .collection("users")
-      .where("timestamp", ">", new Date(Date.parse(new Date()) + 86400 * 1000))
+      .where("timestamp", ">", new Date(Date.parse(new Date()) + (86400 * 1000)))
       .get();
 
     q2.forEach((document) => {
