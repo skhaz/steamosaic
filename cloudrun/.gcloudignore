@@ -3,5 +3,6 @@
 .git
 .gitignore
 
+.env.example
 docker-compose.yaml
 #!include:.gitignore

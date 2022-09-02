@@ -1,4 +1,4 @@
-.PHONY: deploy format update
+.PHONY: deploy format lint update
 
 .SILENT:
 
@@ -7,7 +7,10 @@ deploy:
 
 format:
 	isort main.py
-	black main.py
+	black --line-length 120 main.py
+
+lint:
+	flake8 --max-line-length 120 main.py
 
 update:
 	pur -r requirements.txt

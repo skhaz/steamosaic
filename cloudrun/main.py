@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import tempfile
+from datetime import datetime
 
 import numpy as np
 from flask import Flask, request
@@ -39,10 +40,12 @@ CAPSULE_HEIGHT = 69
 
 def get_steam_id(uid):
     logging.info(f"fetching steam_id of the user {uid}")
+
     try:
         return int(uid)
     except ValueError:
         pass
+
     response = requests.get(PROFILE_URL.format(uid))
     response.raise_for_status()
     return response.json()["response"]["steamid"]
@@ -53,6 +56,14 @@ def get_games(sid):
     response.raise_for_status()
     result = response.json()["response"]["games"]
     return sorted(result, key=lambda g: g["playtime_forever"], reverse=True)
+
+
+def build_url(e):
+    return MEDIA_URL.format(e["appid"], int(datetime.now().timestamp()))
+
+
+def nearest(q, n):
+    return q - (q % n)
 
 
 @memory.cache
@@ -85,21 +96,20 @@ def generate(array, columns):
 @app.route("/", methods=["POST"])
 def index():
     message = request.get_json()["message"]
-
     data = json.loads(base64.b64decode(message["data"]).decode("utf-8"))
-
     uid = data["uid"]
-
     reference = firestore.collection("users").document(uid)
 
     try:
         sid = str(get_steam_id(uid))
         games = get_games(sid)
-        build_url = lambda e: MEDIA_URL.format(e["appid"])
-        funcs = [build_url, download]
-        fetch = lambda game: functools.reduce(lambda g, f: f(g), funcs, game)
-
-        array = np.array([g for g in map(fetch, games) if g is not None])
+        array = np.array(
+            [
+                game
+                for game in map(lambda game: functools.reduce(lambda g, f: f(g), [build_url, download], game), games)
+                if game is not None
+            ]
+        )
     except (KeyError, HTTPError) as exc:
         logging.error(exc, exc_info=True)
         reference.update({"error": "private profile or not found."})
@@ -108,19 +118,12 @@ def index():
     try:
         buffer = io.BytesIO()
         columns = 10
-        nearest = lambda x, n: x - (x % n)
         limit = nearest(len(array), columns)
 
         generate(array[:limit], columns).save(buffer, "JPEG", quality=90)
     except Exception as exc:  # noqa
         logging.error(exc, exc_info=True)
-
-        reference.update(
-            {
-                "error": "internal error or insufficient amount of games to generate the image."
-            }
-        )
-
+        reference.update({"error": "internal error or insufficient amount of games to generate the image."})
         return NO_CONTENT
 
     filepath = f"{sid[-1:]}/{sid}.jpg"
