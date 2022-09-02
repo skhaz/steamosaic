@@ -59,7 +59,7 @@ renderMosaic = (uid, element) => {
         html = `
           <center>
             <h2>${error}</h2>
-            <p><i>you can try again in 5 minutes</i></p>
+            <p><i>you can try again in 1 minute</i></p>
             <a href="/">go back</a>
           </center>`;  
       }

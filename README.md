@@ -12,7 +12,7 @@ But as you can see many issues can occur, like timeouts, cache misses, waste of 
 
 So instead of pulling out an over-engineered task queue or something like that, I changed the cloud function to subscribe to a pubsub topic and on the frontend side creates or start to listen to the firestore document that holds the needed.
 
-On the firebase side, whenever a document is created, a function publishes on the topic that another _worker function_ is listening. 
+On the firebase side, whenever a document is created, a function publishes on the topic that another _worker function_ is listening.
 
 When the _worker function_ finishes, it writes back to the document the public URL of the mosaic image triggering the frontend to display it.
 
@@ -28,18 +28,18 @@ If you want to take a look more deeply, these are the main files [main.py], [ind
 
 Cloud Run
 
-``` bash
-cd cloudrun && gcloud alpha run deploy pubsub --source . --project steamosaic
+```bash
+cd cloudrun && make deploy
 ```
 
 Firebase Functions
 
-``` bash
+```bash
 cd functions && npm run deploy
 ```
 
 Firebase Hosting
 
-``` bash
+```bash
 cd website && npx firebase-tools deploy --only hosting
 ```

@@ -36,7 +36,7 @@ exports.ticker = functions.pubsub
       batch.delete(document.ref);
     });
 
-    const days = 365 * (86400 * 1000);
+    const days = 30 * (86400 * 1000);
 
     const q2 = await firestore
       .collection("users")
