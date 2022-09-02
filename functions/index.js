@@ -23,7 +23,7 @@ exports.notify = functions.firestore
   });
 
 exports.ticker = functions.pubsub
-  .schedule("every 5 minutes")
+  .schedule("every 1 minutes")
   .onRun(async (context) => {
     const batch = firestore.batch();
 
@@ -36,9 +36,11 @@ exports.ticker = functions.pubsub
       batch.delete(document.ref);
     });
 
+    const days = 365 * (86400 * 1000);
+
     const q2 = await firestore
       .collection("users")
-      .where("timestamp", "<", new Date(Date.now() - (86400 * 1000)))
+      .where("timestamp", "<", new Date(Date.now() - days))
       .get();
 
     q2.forEach((document) => {
