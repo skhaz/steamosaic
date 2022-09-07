@@ -5,11 +5,9 @@ import io
 import json
 import logging
 import os
-import tempfile
 from datetime import datetime
 
 import numpy as np
-from diskcache import Cache
 from flask import Flask, request
 from google.cloud.firestore import Client as FirestoreClient
 from google.cloud.storage import Client as StorageClient
@@ -20,8 +18,6 @@ from requests.exceptions import HTTPError
 app = Flask(__name__)
 
 firestore = FirestoreClient()
-
-cache = Cache(tempfile.gettempdir())
 
 requests = Session()
 
@@ -66,7 +62,6 @@ def nearest(q, n):
     return q - (q % n)
 
 
-@cache.memoize
 def download(url):
     try:
         image = Image.open(io.BytesIO(requests.get(url).content))
