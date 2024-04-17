@@ -69,7 +69,7 @@ def download(url):
         # unfortunately, the images do not always have the same size, and
         # np.array requires the same size
         if image.width != CAPSULE_WIDTH or image.height != CAPSULE_HEIGHT:
-            image = image.resize((CAPSULE_WIDTH, CAPSULE_HEIGHT), Image.ANTIALIAS)
+            image = image.resize((CAPSULE_WIDTH, CAPSULE_HEIGHT), Image.LANCZOS)
 
         return np.asarray(image.convert("RGB"))
     except (OSError, IOError):

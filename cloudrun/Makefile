@@ -3,6 +3,7 @@
 .SILENT:
 
 deploy:
+	gcloud config set run/region us-central1
 	gcloud beta run deploy pubsub --source . --project steamosaic
 
 format:
