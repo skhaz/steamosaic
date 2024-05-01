@@ -1,9 +1,15 @@
 onSubmit = (event) => {
   event.preventDefault();
-  const input = document.getElementById('input');
-  var el = document.createElement('a');
+  const input = document.getElementById("input");
+  var el = document.createElement("a");
   el.href = input.value;
-  const value = el.pathname.replace(/\/$/, '').split('/').slice(-1).pop().trim().toLowerCase();
+  const value = el.pathname
+    .replace(/\/$/, "")
+    .split("/")
+    .slice(-1)
+    .pop()
+    .trim()
+    .toLowerCase();
 
   if (value) {
     window.location.hash = value;
@@ -11,10 +17,10 @@ onSubmit = (event) => {
 };
 
 render = () => {
-  const uid = window.location.href.split('#')[1] || '';
-  const element = document.getElementById('container');
+  const uid = window.location.href.split("#")[1] || "";
+  const element = document.getElementById("container");
   uid ? renderMosaic(uid, element) : renderInput(element);
-}
+};
 
 renderInput = (element) => {
   element.innerHTML = `
@@ -32,11 +38,11 @@ renderInput = (element) => {
       <input id="input" type="text" placeholder="skhaz or https://steamcommunity.com/id/skhaz"></input>
     </form>
     `;
-}
+};
 
 renderMosaic = (uid, element) => {
   const firestore = firebase.app().firestore();
-  const ref = firestore.collection('users').doc(uid);
+  const ref = firestore.collection("users").doc(uid);
   const unsubscribe = ref.onSnapshot((snapshot) => {
     if (!snapshot.exists) {
       ref.set({ timestamp: new Date() });
@@ -54,14 +60,16 @@ renderMosaic = (uid, element) => {
       </center>`;
     } else {
       if (url) {
-        html = `<img class="display" src="${url}">`;
+        html = `
+          <img class="display" src="${url}">
+        `;
       } else if (error) {
         html = `
           <center>
             <h2>${error}</h2>
             <p><i>you can try again in 1 minute</i></p>
             <a href="/">go back</a>
-          </center>`;  
+          </center>`;
       }
 
       unsubscribe();
@@ -69,7 +77,7 @@ renderMosaic = (uid, element) => {
 
     element.innerHTML = html;
   });
-}
+};
 
-document.addEventListener('DOMContentLoaded', render);
-window.addEventListener('hashchange', render);
+document.addEventListener("DOMContentLoaded", render);
+window.addEventListener("hashchange", render);
