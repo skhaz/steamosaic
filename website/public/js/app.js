@@ -39,7 +39,7 @@ renderInput = (element) => {
       </form>
       <div style="position: relative; text-align: center;">
         <p style="position: absolute; bottom: -16px; left: 50%; transform: translateX(-50%);">
-          <a href="mailto:rodrigodelduca@gmail.com">rodrigodelduca@gmail.com</a>
+          By <a href="mailto:rodrigodelduca@gmail.com">rodrigodelduca@gmail.com</a>
         </p>
       </div>
       `;
