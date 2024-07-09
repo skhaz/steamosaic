@@ -36,6 +36,7 @@ renderInput = (element) => {
         <p>enter your <b>steam</b> profile (make sure your profile is public)</p>
       </label>
       <input id="input" type="text" placeholder="skhaz or https://steamcommunity.com/id/skhaz"></input>
+      <p style="text-align: center; position: absolute; bottom: -16px;"><a href="mailto:rodrigodelduca@gmail.com">rodrigodelduca@gmail.com</p>
     </form>
     `;
 };
