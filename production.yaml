@@ -1,0 +1,18 @@
+x-logging: &logging
+  driver: syslog
+  options:
+    syslog-address: "udp://logs2.papertrailapp.com:33444"
+    tag: "{{.Name}}/{{.ID}}"
+
+services:
+  app:
+    logging:
+      <<: *logging
+  cloudflare:
+    image: cloudflare/cloudflared:latest
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TOKEN}
+    command: tunnel --no-autoupdate run
+    restart: unless-stopped
+    logging:
+      <<: *logging

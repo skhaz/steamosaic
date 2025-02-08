@@ -1,0 +1,5 @@
+aiohttp==3.11.12
+fastapi==0.115.8
+numpy==2.2.2
+opencv-python==4.11.0.86
+uvicorn==0.34.0
