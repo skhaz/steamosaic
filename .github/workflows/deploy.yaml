@@ -1,0 +1,53 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+      - name: Configure SSH known_hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.HETZNER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Deploy using Docker Compose
+        env:
+          DOCKER_HOST: ssh://root@${{ secrets.HETZNER_IP }}
+          CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
+          STEAM_PROFILE_URL: ${{ secrets.STEAM_PROFILE_URL }}
+          STEAM_GAMES_URL: ${{ secrets.STEAM_GAMES_URL }}
+          STEAM_MEDIA_URL: ${{ secrets.STEAM_MEDIA_URL }}
+        run: |
+          set -e
+
+          docker compose --file compose.yaml --file production.yaml down --remove-orphans
+
+          docker system prune --all --force
+
+          docker compose --file compose.yaml --file production.yaml up --build --force-recreate --detach
+
+          echo "Listing all Docker containers:"
+          docker ps -a
+
+      - name: Purge Cloudflare Cache
+        env:
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          curl -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/purge_cache" \
+                -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+                -H "Content-Type: application/json" \
+                --data '{"purge_everything":true}'

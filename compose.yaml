@@ -1,0 +1,13 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - STEAM_PROFILE_URL=${STEAM_PROFILE_URL}
+      - STEAM_GAMES_URL=${STEAM_GAMES_URL}
+      - STEAM_MEDIA_URL=${STEAM_MEDIA_URL}
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
