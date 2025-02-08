@@ -7,6 +7,4 @@ services:
       - STEAM_PROFILE_URL=${STEAM_PROFILE_URL}
       - STEAM_GAMES_URL=${STEAM_GAMES_URL}
       - STEAM_MEDIA_URL=${STEAM_MEDIA_URL}
-    ports:
-      - 3000:3000
     restart: unless-stopped
