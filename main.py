@@ -43,10 +43,10 @@ async def fetch(
         except aiohttp.ClientResponseError as exc:
             if exc.status == 404:
                 return None
-            logger.exception("Error fetching URL %s: %s", url, exc)
+            logger.exception("Error fetching URL %s: %s", url)
             return None
-        except Exception as exc:
-            logger.exception("Error fetching URL %s: %s", url, exc)
+        except:  # noqa
+            logger.exception("Error fetching URL %s: %s", url)
             return None
 
 
