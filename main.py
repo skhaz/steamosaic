@@ -3,13 +3,20 @@ import hashlib
 import logging
 import os
 import time
-from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional, cast
+from datetime import datetime
+from datetime import timedelta
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import cast
 
 import aiohttp
 import cv2
 import numpy as np
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI
+from fastapi import HTTPException
+from fastapi import Response
 from fastapi.responses import FileResponse
 from numpy.typing import NDArray
 
@@ -36,9 +43,7 @@ async def fetch(
                 response.raise_for_status()
                 data: bytes = await response.read()
                 buffer: np.ndarray = np.frombuffer(data, np.uint8)
-                image: Optional[ImageArray] = cast(
-                    Optional[ImageArray], cv2.imdecode(buffer, cv2.IMREAD_COLOR)
-                )
+                image: Optional[ImageArray] = cast(Optional[ImageArray], cv2.imdecode(buffer, cv2.IMREAD_COLOR))
                 return image
         except aiohttp.ClientResponseError as exc:
             if exc.status == 404:
@@ -74,10 +79,8 @@ def create_mosaic(images: List[ImageArray], columns: int = 10) -> Optional[Image
         min_height: int = min(img.shape[0] for img in row_imgs)
         cropped_row: List[ImageArray] = [
             img[
-                (img.shape[0] - min_height) // 2 : (img.shape[0] - min_height) // 2
-                + min_height,
-                (img.shape[1] - min_width) // 2 : (img.shape[1] - min_width) // 2
-                + min_width,
+                (img.shape[0] - min_height) // 2 : (img.shape[0] - min_height) // 2 + min_height,
+                (img.shape[1] - min_width) // 2 : (img.shape[1] - min_width) // 2 + min_width,
             ]
             for img in row_imgs
         ]
@@ -89,8 +92,7 @@ def create_mosaic(images: List[ImageArray], columns: int = 10) -> Optional[Image
     cropped_rows: List[np.ndarray] = [
         row[
             :,
-            (row.shape[1] - target_width) // 2 : (row.shape[1] - target_width) // 2
-            + target_width,
+            (row.shape[1] - target_width) // 2 : (row.shape[1] - target_width) // 2 + target_width,
         ]
         for row in mosaic_rows
     ]
@@ -112,11 +114,7 @@ async def get_cover_urls(username: str) -> List[str]:
     games: List[Dict[str, Any]] = games_data.get("response", {}).get("games", [])
     games.sort(key=lambda game: game.get("playtime_forever", 0), reverse=True)
     timestamp: int = int(time.time())
-    return [
-        STEAM_MEDIA_URL.format(game["appid"], timestamp)
-        for game in games
-        if "appid" in game
-    ]
+    return [STEAM_MEDIA_URL.format(game["appid"], timestamp) for game in games if "appid" in game]
 
 
 @app.get("/", response_class=FileResponse)
@@ -125,6 +123,13 @@ async def index() -> FileResponse:
         os.path.join(os.path.dirname(__file__), "index.html"),
         media_type="text/html",
     )
+
+
+@app.get("/favicon.ico")
+async def favicon():
+    duration = timedelta(days=365)
+    headers = {"Cache-Control": f"public, max-age={int(duration.total_seconds())}, immutable"}
+    return Response(content=b"", media_type="image/x-icon", headers=headers)
 
 
 @app.get("/{username}.jpeg")
