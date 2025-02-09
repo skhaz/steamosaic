@@ -121,8 +121,10 @@ async def get_cover_urls(username: str) -> List[str]:
 
 @app.get("/", response_class=FileResponse)
 async def index() -> FileResponse:
-    index_path: str = os.path.join(os.path.dirname(__file__), "index.html")
-    return FileResponse(index_path, media_type="text/html")
+    return FileResponse(
+        os.path.join(os.path.dirname(__file__), "index.html"),
+        media_type="text/html",
+    )
 
 
 @app.get("/{username}.jpeg")
