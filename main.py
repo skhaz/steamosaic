@@ -18,9 +18,10 @@ from fastapi import FastAPI
 from fastapi import HTTPException
 from fastapi import Response
 from fastapi.responses import FileResponse
+from numpy import uint8
 from numpy.typing import NDArray
 
-ImageArray = NDArray[np.uint8]
+ImageArray = NDArray[uint8]
 
 STEAM_PROFILE_URL: str = os.environ["STEAM_PROFILE_URL"]
 STEAM_GAMES_URL: str = os.environ["STEAM_GAMES_URL"]
