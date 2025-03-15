@@ -98,11 +98,7 @@
     </style>
   </head>
   <body>
-    <a
-      href="https://github.com/skhaz/steamosaic"
-      class="github-corner"
-      aria-label="View source on GitHub"
-    >
+    <a href="https://github.com/skhaz/steamosaic" class="github-corner" aria-label="View source on GitHub">
       <svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true">
         <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
         <path
@@ -121,19 +117,11 @@
 
     <main>
       <form action="#" onsubmit="onSubmit(event); return false;">
-        <label for="input">
-          Enter your <b>Steam</b> profile (make sure your profile is public)
-        </label>
-        <input
-          id="input"
-          type="text"
-          placeholder="skhaz or https://steamcommunity.com/id/skhaz"
-        />
+        <label for="input"> Enter your <b>Steam</b> profile (make sure your profile is public) </label>
+        <input id="input" type="text" placeholder="skhaz or https://steamcommunity.com/id/skhaz" />
       </form>
       <div class="footer">
-        <p>
-          By <a href="https://rodrigodelduca.com.br">rodrigodelduca.com.br</a>
-        </p>
+        <p>By <a href="https://rodrigodelduca.org">rodrigodelduca.org</a></p>
       </div>
     </main>
 
@@ -143,12 +131,7 @@
         const input = document.getElementById("input");
         const link = document.createElement("a");
         link.href = input.value;
-        const value = link.pathname
-          .replace(/\/$/, "")
-          .split("/")
-          .pop()
-          .trim()
-          .toLowerCase();
+        const value = link.pathname.replace(/\/$/, "").split("/").pop().trim().toLowerCase();
         if (value) {
           window.location = `/${value}.jpeg`;
         }
