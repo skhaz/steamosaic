@@ -165,6 +165,12 @@ async def mosaic(username: str) -> Response:
     return Response(content=encoded.tobytes(), media_type="image/jpeg", headers=headers)
 
 
+@app.get("/{path:path}.php")
+async def honeypot(path: str) -> Response:
+    await asyncio.sleep(60)
+    return Response(status_code=204)
+
+
 def main() -> None:
     import uvicorn
 
