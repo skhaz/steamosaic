@@ -1,12 +1,12 @@
 FROM public.ecr.aws/lambda/python:3.13
 
-RUN yum install -y \
+RUN microdnf install -y \
       mesa-libGL \
       mesa-libEGL \
       libSM \
       libXrender \
       libXext \
-    && yum clean all
+    && microdnf clean all
 
 WORKDIR /var/task
 
