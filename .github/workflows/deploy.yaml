@@ -27,7 +27,13 @@ jobs:
       - name: Compress the app
         run: |
           cp -r package/* .
-          zip -r function.zip . -x ".git/*" -x ".github/*" -x "*.workflow*" -x "__pycache__/*" -x "cv2/cuda/*" -x "cv2/cuda/**"
+          zip -r function.zip . \
+            -x '*.pyc' \
+            -x '*/__pycache__/*' \
+            -x 'package/cv2/cuda/*' \
+            -x '.git/*' \
+            -x '.github/*'
+
           ls -lah *.zip
 
       - name: Deploy on AWS Lambda
