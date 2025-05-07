@@ -13,34 +13,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up SSH Key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
 
-      - name: Configure SSH known_hosts
-        run: |
-          ssh-keyscan -H ${{ secrets.HETZNER_IP }} >> ~/.ssh/known_hosts
+      - name: Install AWS tools
+        run: pip --no-cache-dir install awscli
 
-      - name: Deploy using Docker Compose
+      - name: Install dependencies
+        run: pip --no-cache-dir install -r requirements.txt -t package
+
+      - name: Compress the app
+        run: |
+          cp -r package/* .
+          zip -r function.zip . -x ".git/*" ".github/*" "*.workflow*"
+
+      - name: Deploy on AWS Lambda
         env:
-          DOCKER_HOST: ssh://root@${{ secrets.HETZNER_IP }}
-          CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
-          STEAM_PROFILE_URL: ${{ secrets.STEAM_PROFILE_URL }}
-          STEAM_GAMES_URL: ${{ secrets.STEAM_GAMES_URL }}
-          STEAM_MEDIA_URL: ${{ secrets.STEAM_MEDIA_URL }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: |
-          set -e
-
-          docker compose --file compose.yaml --file production.yaml down --remove-orphans
-
-          docker system prune --all --force
-
-          docker compose --file compose.yaml --file production.yaml up --build --force-recreate --detach
-
-          echo "Listing all Docker containers:"
-          docker ps -a
+          aws lambda update-function-code --function-name steamosaic --zip-file fileb://function.zip
 
       - name: Purge Cloudflare Cache
         env:

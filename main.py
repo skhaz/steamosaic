@@ -18,6 +18,7 @@ from fastapi import FastAPI
 from fastapi import HTTPException
 from fastapi import Response
 from fastapi.responses import FileResponse
+from mangum import Mangum
 from numpy import uint8
 from numpy.typing import NDArray
 
@@ -51,6 +52,7 @@ async def fetch(
                 return None
             logger.exception("Error fetching URL %s: %s", url)
             return None
+
         except:  # noqa
             logger.exception("Error fetching URL %s: %s", url)
             return None
@@ -61,11 +63,13 @@ async def download(urls: List[str]) -> List[ImageArray]:
     semaphore: asyncio.Semaphore = asyncio.Semaphore(worker_count)
     timeout: aiohttp.ClientTimeout = aiohttp.ClientTimeout(total=30)
     connector: aiohttp.TCPConnector = aiohttp.TCPConnector(limit_per_host=worker_count)
+
     async with aiohttp.ClientSession(timeout=timeout, connector=connector) as session:
         tasks: List[asyncio.Task[Optional[ImageArray]]] = [
             asyncio.create_task(fetch(url, semaphore, session)) for url in urls
         ]
         results: List[Optional[ImageArray]] = await asyncio.gather(*tasks)
+
     return [img for img in results if img is not None]
 
 
@@ -85,9 +89,11 @@ def create_mosaic(images: List[ImageArray], columns: int = 10) -> Optional[Image
             ]
             for img in row_imgs
         ]
+
         if len(cropped_row) < columns:
             pad_img: ImageArray = np.zeros((min_height, min_width, 3), dtype=np.uint8)
             cropped_row.extend([pad_img] * (columns - len(cropped_row)))
+
         mosaic_rows.append(np.hstack(cropped_row))
     target_width: int = min(row.shape[1] for row in mosaic_rows)
     cropped_rows: List[np.ndarray] = [
@@ -97,6 +103,7 @@ def create_mosaic(images: List[ImageArray], columns: int = 10) -> Optional[Image
         ]
         for row in mosaic_rows
     ]
+
     return np.vstack(cropped_rows)
 
 
@@ -106,15 +113,19 @@ async def get_cover_urls(username: str) -> List[str]:
         async with session.get(STEAM_PROFILE_URL.format(username)) as response:
             response.raise_for_status()
             profile_data: Dict[str, Any] = await response.json()
+
         if profile_data.get("response", {}).get("success") != 1:
             return []
+
         steam_id: str = profile_data["response"].get("steamid", "")
         async with session.get(STEAM_GAMES_URL.format(steam_id)) as response:
             response.raise_for_status()
             games_data: Dict[str, Any] = await response.json()
+
     games: List[Dict[str, Any]] = games_data.get("response", {}).get("games", [])
     games.sort(key=lambda game: game.get("playtime_forever", 0), reverse=True)
     timestamp: int = int(time.time())
+
     return [STEAM_MEDIA_URL.format(game["appid"], timestamp) for game in games if "appid" in game]
 
 
@@ -139,14 +150,17 @@ async def mosaic(username: str) -> Response:
     if not urls:
         logger.error("Failed to retrieve cover URLs for user %s", username)
         raise HTTPException(status_code=404, detail="Cover URLs not found.")
+
     images: List[ImageArray] = await download(urls)
     if not images:
         logger.error("Failed to download images for user %s", username)
         raise HTTPException(status_code=404, detail="Image download failed.")
+
     mosaic_image: Optional[ImageArray] = create_mosaic(images, columns=10)
     if mosaic_image is None:
         logger.error("Failed to create mosaic for user %s", username)
         raise HTTPException(status_code=500, detail="Mosaic creation failed.")
+
     success: bool
     encoded: np.ndarray
     success, encoded = cv2.imencode(".jpg", mosaic_image)
@@ -162,20 +176,8 @@ async def mosaic(username: str) -> Response:
         "Cache-Control": f"public, max-age={int(duration.total_seconds())}, immutable",
         "Expires": expires,
     }
+
     return Response(content=encoded.tobytes(), media_type="image/jpeg", headers=headers)
 
 
-@app.get("/{path:path}.php")
-async def honeypot(path: str) -> Response:
-    await asyncio.sleep(60)
-    return Response(status_code=204)
-
-
-def main() -> None:
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=3000)
-
-
-if __name__ == "__main__":
-    main()
+handler = Mangum(app, lifespan="off")

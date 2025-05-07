@@ -1,5 +1,6 @@
 aiohttp==3.11.12
 fastapi==0.115.8
+mangum==0.19.0
 numpy==2.2.2
 opencv-python-headless==4.11.0.86
 uvicorn==0.34.0
