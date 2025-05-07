@@ -88,19 +88,21 @@ jobs:
       - name: Cleanup old ECR images
         run: |
           REPO=steamosaic
-          THIRTY_DAYS_AGO=$(date -d '30 days ago' +%s)
 
-          aws ecr describe-images \
+          CUTOFF=$(date -d '30 days ago' --utc +%Y-%m-%dT%H:%M:%SZ)
+
+          DIGESTS=$(aws ecr describe-images \
             --repository-name $REPO \
-            --query 'imageDetails[?to_string(imagePushedAt) < `'"$THIRTY_DAYS_AGO"'`]' \
+            --query 'imageDetails[*].{digest:imageDigest,pushedAt:imagePushedAt}' \
             --output json \
-          > old.json
+          | jq -r --arg CUT "$CUTOFF" \
+              '.[] | select(.pushedAt < $CUT) | .digest')
 
-          # deleta pelas digests
-          for digest in $(jq -r '.[].imageDigest' old.json); do
+          for d in $DIGESTS; do
             aws ecr batch-delete-image \
               --repository-name $REPO \
-              --image-ids imageDigest=$digest
+              --image-ids imageDigest=$d \
+              || echo "Failed deleting image $d"
           done
 
       - name: Purge Cloudflare Cache
