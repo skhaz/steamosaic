@@ -74,7 +74,7 @@ async def download(urls: List[str]) -> List[ImageArray]:
 
 def create_mosaic(images: List[ImageArray], columns: int = 10) -> Optional[ImageArray]:
     if not images:
-        return None
+        return
 
     mosaic_rows: List[np.ndarray] = []
     for i in range(0, len(images), columns):
