@@ -72,17 +72,36 @@ jobs:
           ROLE_ARN=$(aws iam get-role --role-name steamosaic-lambda-role --query Role.Arn --output text)
           IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/steamosaic:latest
           if aws lambda get-function --function-name steamosaic; then
-            aws lambda update-function-code --function-name steamosaic --image-uri $IMAGE_URI || true
-            aws lambda update-function-configuration --function-name steamosaic --timeout 900 || true
+            aws lambda update-function-code --function-name steamosaic --image-uri $IMAGE_URI
+            aws lambda update-function-configuration --function-name steamosaic --architectures arm64 --timeout 900
           else
             aws lambda create-function \
               --function-name steamosaic \
+              --architectures arm64 \
               --package-type Image \
               --code ImageUri=$IMAGE_URI \
               --role $ROLE_ARN \
               --timeout 900 \
               --memory-size 1024 || true
           fi
+
+      - name: Cleanup old ECR images
+        run: |
+          REPO=steamosaic
+          THIRTY_DAYS_AGO=$(date -d '30 days ago' +%s)
+
+          aws ecr describe-images \
+            --repository-name $REPO \
+            --query 'imageDetails[?to_string(imagePushedAt) < `'"$THIRTY_DAYS_AGO"'`]' \
+            --output json \
+          > old.json
+
+          # deleta pelas digests
+          for digest in $(jq -r '.[].imageDigest' old.json); do
+            aws ecr batch-delete-image \
+              --repository-name $REPO \
+              --image-ids imageDigest=$digest
+          done
 
       - name: Purge Cloudflare Cache
         env:
