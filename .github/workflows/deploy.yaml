@@ -77,7 +77,7 @@ jobs:
           IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/steamosaic:latest
           if aws lambda get-function --function-name steamosaic; then
             aws lambda update-function-code --function-name steamosaic --image-uri $IMAGE_URI
-            aws lambda update-function-configuration --function-name steamosaic --timeout 900
+            aws lambda update-function-configuration --function-name steamosaic --memory-size 2048 --timeout 900
             aws lambda wait function-updated --function-name steamosaic
           else
             aws lambda create-function \
@@ -87,7 +87,7 @@ jobs:
               --code ImageUri=$IMAGE_URI \
               --role $ROLE_ARN \
               --timeout 900 \
-              --memory-size 1024 || true
+              --memory-size 2048 || true
           fi
 
       - name: Cleanup old ECR images
@@ -104,10 +104,10 @@ jobs:
               '.[] | select(.pushedAt < $CUT) | .digest')
 
           for d in $DIGESTS; do
+            echo "Deleting image from ECR $d..."
             aws ecr batch-delete-image \
               --repository-name $REPO \
-              --image-ids imageDigest=$d \
-              || echo "Failed deleting image $d"
+              --image-ids imageDigest=$d
           done
 
       - name: Purge Cloudflare Cache
