@@ -32,6 +32,8 @@ jobs:
             -x '*/__pycache__/*' \
             -x 'package/cv2/cuda/*' \
             -x 'package/numpy/f2py/tests/*' \
+            -x 'package/cv2/data/*' \
+            -x 'package/cv2/.dylibs' \
             -x '.git/*' \
             -x '.github/*'
 
