@@ -1,12 +1,12 @@
 FROM public.ecr.aws/lambda/python:3.13
 
-RUN microdnf install -y \
-      mesa-libGL \
-      mesa-libEGL \
-      libSM \
-      libXrender \
-      libXext \
-    && microdnf clean all
+# RUN microdnf install -y \
+#       mesa-libGL \
+#       mesa-libEGL \
+#       libSM \
+#       libXrender \
+#       libXext \
+#     && microdnf clean all
 
 WORKDIR /var/task
 
