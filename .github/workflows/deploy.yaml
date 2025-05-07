@@ -73,7 +73,7 @@ jobs:
           IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/steamosaic:latest
           if aws lambda get-function --function-name steamosaic; then
             aws lambda update-function-code --function-name steamosaic --image-uri $IMAGE_URI
-            aws lambda update-function-configuration --function-name steamosaic --architectures arm64 --timeout 900
+            aws lambda update-function-configuration --function-name steamosaic --timeout 900
           else
             aws lambda create-function \
               --function-name steamosaic \
