@@ -28,8 +28,23 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
 
+      - name: Ensure Lambda IAM role exists
+        run: |
+          ROLE_NAME=steamosaic-lambda-role
+          ASSUME_POLICY='{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"lambda.amazonaws.com"},"Action":"sts:AssumeRole"}]}'
+          aws iam get-role --role-name $ROLE_NAME || \
+            aws iam create-role --role-name $ROLE_NAME --assume-role-policy-document "$ASSUME_POLICY"
+
+      - name: Attach IAM policies to role
+        run: |
+          ROLE_NAME=steamosaic-lambda-role
+          for POLICY in \
+            arn:aws:iam::aws:policy/AWSLambdaBasicExecutionRole \
+            arn:aws:iam::aws:policy/AmazonAPIGatewayAdministrator; do
+            aws iam attach-role-policy --role-name $ROLE_NAME --policy-arn $POLICY || true
+          done
+
       - name: Ensure ECR repository exists
-        continue-on-error: true
         run: |
           aws ecr describe-repositories \
             --repository-names steamosaic \
@@ -52,12 +67,23 @@ jobs:
           docker tag steamosaic:latest $IMAGE_URI
           docker push $IMAGE_URI
 
-      - name: Update Lambda function
+      - name: Update AWS Lambda function
+        continue-on-error: true
         run: |
+          ROLE_ARN=$(aws iam get-role --role-name steamosaic-lambda-role --query Role.Arn --output text)
           IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/steamosaic:latest
-          aws lambda update-function-code \
-            --function-name steamosaic \
-            --image-uri $IMAGE_URI
+          if aws lambda get-function --function-name steamosaic; then
+            aws lambda update-function-code --function-name steamosaic --image-uri $IMAGE_URI || true
+            aws lambda update-function-configuration --function-name steamosaic --timeout 900 || true
+          else
+            aws lambda create-function \
+              --function-name steamosaic \
+              --package-type Image \
+              --code ImageUri=$IMAGE_URI \
+              --role $ROLE_ARN \
+              --timeout 900 \
+              --memory-size 1024 || true
+
 
       - name: Purge Cloudflare Cache
         env:
