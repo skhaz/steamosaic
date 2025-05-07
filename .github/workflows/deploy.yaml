@@ -21,31 +21,33 @@ jobs:
       - name: Install AWS tools
         run: pip --no-cache-dir install awscli
 
-      - name: Install dependencies
-        run: pip --no-cache-dir install -r requirements.txt -t package
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
 
-      - name: Compress the app
+      - name: Login to ECR
         run: |
-          cp -r package/* .
-          zip -r function.zip . \
-            -x '*.pyc' \
-            -x '*/__pycache__/*' \
-            -x 'package/cv2/cuda/*' \
-            -x 'package/numpy/f2py/tests/*' \
-            -x 'package/cv2/data/*' \
-            -x 'package/cv2/.dylibs' \
-            -x '.git/*' \
-            -x '.github/*'
+          aws ecr get-login-password \
+            | docker login \
+                --username AWS \
+                --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com
 
-          ls -lah *.zip
-
-      - name: Deploy on AWS Lambda
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      - name: Build, Tag & Push Docker image
         run: |
-          aws lambda update-function-code --function-name steamosaic --zip-file fileb://function.zip
+          IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/steamosaic:latest
+          docker build -t steamosaic .
+          docker tag steamosaic:latest $IMAGE_URI
+          docker push $IMAGE_URI
+
+      - name: Update Lambda function
+        run: |
+          IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/steamosaic:latest
+          aws lambda update-function-code \
+            --function-name steamosaic \
+            --image-uri $IMAGE_URI
 
       - name: Purge Cloudflare Cache
         env:
