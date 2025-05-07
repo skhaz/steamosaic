@@ -28,6 +28,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
 
+      - name: Ensure ECR repository exists
+        continue-on-error: true
+        run: |
+          aws ecr describe-repositories \
+            --repository-names steamosaic \
+            --region ${{ secrets.AWS_DEFAULT_REGION }} \
+          || aws ecr create-repository \
+            --repository-name steamosaic \
+            --region ${{ secrets.AWS_DEFAULT_REGION }}
+
       - name: Login to ECR
         run: |
           aws ecr get-login-password \
