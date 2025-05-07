@@ -1,19 +1,26 @@
-FROM public.ecr.aws/lambda/python:3.13
+FROM python:3.13-slim AS base
 
-# RUN microdnf install -y \
-#       mesa-libGL \
-#       mesa-libEGL \
-#       libSM \
-#       libXrender \
-#       libXext \
-#     && microdnf clean all
+ENV PATH=/opt/venv/bin:$PATH
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
 
-WORKDIR /var/task
+FROM base AS venv
+WORKDIR /opt/venv
+COPY *.txt .
+RUN <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
 
-COPY requirements.txt .
+python -m venv .
+. bin/activate
+pip install --no-cache-dir --requirement requirements.txt
+EOF
 
-RUN pip install --no-cache-dir -r requirements.txt
-
+FROM base
+WORKDIR /opt/venv
+COPY --from=venv /opt/venv .
+WORKDIR /opt/app
 COPY . .
 
-CMD ["main.handler"]
+ENTRYPOINT ["uvicorn"]
+CMD ["main:app", "--host", "0.0.0.0", "--port", "3000", "--workers", "4"]

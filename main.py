@@ -18,7 +18,6 @@ from fastapi import FastAPI
 from fastapi import HTTPException
 from fastapi import Response
 from fastapi.responses import FileResponse
-from mangum import Mangum
 from numpy import uint8
 from numpy.typing import NDArray
 
@@ -178,6 +177,3 @@ async def mosaic(username: str) -> Response:
     }
 
     return Response(content=encoded.tobytes(), media_type="image/jpeg", headers=headers)
-
-
-handler = Mangum(app, lifespan="off")
