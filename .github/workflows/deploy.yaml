@@ -67,7 +67,7 @@ jobs:
       - name: Build, Tag & Push Docker image
         run: |
           IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/steamosaic:latest
-          docker buildx --platform=linux/amd64 --tag steamosaic .
+          docker buildx build --platform=linux/amd64 --tag steamosaic .
           docker tag steamosaic:latest $IMAGE_URI
           docker push $IMAGE_URI
 
