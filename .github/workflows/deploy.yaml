@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
 
     steps:
       - name: Checkout code
@@ -67,7 +67,7 @@ jobs:
       - name: Build, Tag & Push Docker image
         run: |
           IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/steamosaic:latest
-          docker build --platform=linux/amd64 --tag steamosaic .
+          docker buildx --platform=linux/amd64 --tag steamosaic .
           docker tag steamosaic:latest $IMAGE_URI
           docker push $IMAGE_URI
 
