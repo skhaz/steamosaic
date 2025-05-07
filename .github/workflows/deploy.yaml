@@ -68,7 +68,6 @@ jobs:
           docker push $IMAGE_URI
 
       - name: Update AWS Lambda function
-        continue-on-error: true
         run: |
           ROLE_ARN=$(aws iam get-role --role-name steamosaic-lambda-role --query Role.Arn --output text)
           IMAGE_URI=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_DEFAULT_REGION }}.amazonaws.com/steamosaic:latest
@@ -83,7 +82,7 @@ jobs:
               --role $ROLE_ARN \
               --timeout 900 \
               --memory-size 1024 || true
-
+          fi
 
       - name: Purge Cloudflare Cache
         env:
