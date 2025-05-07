@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -74,6 +78,7 @@ jobs:
           if aws lambda get-function --function-name steamosaic; then
             aws lambda update-function-code --function-name steamosaic --image-uri $IMAGE_URI
             aws lambda update-function-configuration --function-name steamosaic --timeout 900
+            aws lambda wait function-updated --function-name steamosaic
           else
             aws lambda create-function \
               --function-name steamosaic \
