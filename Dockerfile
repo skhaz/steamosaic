@@ -7,14 +7,9 @@ ENV PYTHONDONTWRITEBYTECODE=1
 FROM base AS venv
 WORKDIR /opt/venv
 COPY *.txt .
-RUN <<EOF
-#!/usr/bin/env bash
-set -euo pipefail
-
-python -m venv .
-. bin/activate
-pip install --no-cache-dir --requirement requirements.txt
-EOF
+RUN python -m venv . && \
+  . bin/activate && \
+  pip install --no-cache-dir --requirement requirements.txt
 
 FROM base
 WORKDIR /opt/venv
